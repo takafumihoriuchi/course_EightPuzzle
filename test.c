@@ -1,5 +1,10 @@
 #include <stdio.h>
 
+typedef struct node {
+   int elem_a;// = 0;
+   int elem_b;// = 1;
+} TEST;
+
 void print_array(int array[][3])
 {
    int i, j;
@@ -20,5 +25,11 @@ int main(void)
       {{0,8,7},{6,5,4},{3,2,1}}
    };
    print_array(array[2]);
+
+   TEST test;
+   test.elem_a = 10;
+   printf("elem_a : %d\n", test.elem_a);
+   printf("elem_b : %d\n", test.elem_b);
+
    return 0;
 }
