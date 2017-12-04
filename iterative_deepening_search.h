@@ -17,7 +17,8 @@ int get_open_head_depth();
 void insert_to_closed(int map[][3]);
 int is_in_closed(int child[][3]);
 void release_closed_list();
-void copy_array2_to_array1(int array1[][3], int array2[][3]);
+void copy_array2_to_array1_1dim(int array1[], int array2[], int elem_num);
+void copy_array2_to_array1_2dim(int array1[][3], int array2[][3]);
 int is_equal_array(int array1[][3], int array2[][3]);
 void check_malloc_open(OPENSTACK *node);
 void check_malloc_closed(CLOSEDLIST *node);
@@ -48,7 +49,7 @@ int iterative_deepening_search(int map[][3])
 		pop_success = pop_from_open(map);
 		if (!pop_success) {
 			// initial map data is stored at the tail of closed list
-			copy_array2_to_array1(map, (*closed_tail).map_data);
+			copy_array2_to_array1_2dim(map, (*closed_tail).map_data);
 			release_closed_list();
 			push_to_open(map, 0);
 			limit++;
@@ -58,7 +59,7 @@ int iterative_deepening_search(int map[][3])
 		// depth limited search
 		if (node_depth >= limit) continue;
 
-		copy_array2_to_array1(child_flg, child_clear);
+		copy_array2_to_array1_1dim(child_flg, child_clear, 4);
 		// expand node, then check if child node is in goal state; return 1 if so
 		if (expand_node(child[0], 'e', 0, child_flg, map)) return 1;  // up
 		if (expand_node(child[1], 'd', 1, child_flg, map)) return 1;  // down
@@ -81,7 +82,7 @@ int expand_node(int child[][3], char direction, int child_num, int child_flg[], 
 {
 	if (is_valid(map, direction)) {
 		child_flg[child_num] = 1;
-		copy_array2_to_array1(child, map);
+		copy_array2_to_array1_2dim(child, map);
 		operate(child, direction);
 		// end if one of the child node is in goal state
 		if (is_completed(child)) return 1;
@@ -94,7 +95,7 @@ void push_to_open(int map[][3], int depth)
 	OPENSTACK *node;
 	node = malloc(sizeof(OPENSTACK));
 	check_malloc_open(node);
-	copy_array2_to_array1((*node).map_data, map);
+	copy_array2_to_array1_2dim((*node).map_data, map);
 	(*node).depth = depth;
 	(*node).next = open_head;
 	open_head = node;
@@ -103,7 +104,7 @@ void push_to_open(int map[][3], int depth)
 int pop_from_open(int map[][3])
 {
 	if (open_head == NULL) return 0;
-	copy_array2_to_array1(map, (*open_head).map_data);
+	copy_array2_to_array1_2dim(map, (*open_head).map_data);
 	OPENSTACK *tmp = open_head;
 	if ((*open_head).next == NULL) open_head = NULL;
 	else open_head = (*open_head).next;
@@ -121,7 +122,7 @@ void insert_to_closed(int map[][3])
 	CLOSEDLIST *node;
 	node = malloc(sizeof(CLOSEDLIST));
 	check_malloc_closed(node);
-	copy_array2_to_array1((*node).map_data, map);
+	copy_array2_to_array1_2dim((*node).map_data, map);
 	if (closed_head == NULL) closed_tail = node;
 	(*node).next = closed_head;
 	closed_head = node;
@@ -152,7 +153,15 @@ void release_closed_list()
 	closed_tail = NULL;  // not necessary, but more feels clean to do so
 }
 
-void copy_array2_to_array1(int array1[][3], int array2[][3])
+// restricted to one-dimension array
+void copy_array2_to_array1_1dim(int array1[], int array2[], int elem_num)
+{
+	int i;
+	for (i=0; i<elem_num; i++) array1[i] = array2[i];
+}
+
+// restricted to three-three-element-two-dimension array
+void copy_array2_to_array1_2dim(int array1[][3], int array2[][3])
 {
 	int i, j;
 	for (i=0; i<3; i++)
