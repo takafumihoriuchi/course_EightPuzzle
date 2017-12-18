@@ -28,10 +28,10 @@ CLOSEDLIST *closed_head = NULL;
 CLOSEDLIST *closed_tail = NULL;
 
 // precondition : receives a map (randomly initialized)
-// postcondition : return 1 if solution is found(, if not, return 0)
+// postcondition : return 1 if solution is found, if not, return 0
 int iterative_deepening_search(int map[][3])
 {
-	int limit = 0; int count=0; // 'count' is for debugging
+	int limit = 0;
 	int i, pop_success, node_depth;
 	int child[4][3][3];
 	int child_flg[4];  // 0: up, 1:down, 2:left, 3:right
@@ -45,9 +45,6 @@ int iterative_deepening_search(int map[][3])
 	while (1) {
 
 		node_depth = get_open_head_depth();
-		printf("node_depth : %d\n", node_depth);
-		printf("limit : %d\n", limit);
-		printf("count : %d\n", count++); // added for debugging
 
 		// pop top of stack and store in map
 		pop_success = pop_from_open(map);
@@ -72,9 +69,9 @@ int iterative_deepening_search(int map[][3])
 		if (expand_node(child[2], 's', 2, child_flg, map)) return 1;  // left
 		if (expand_node(child[3], 'f', 3, child_flg, map)) return 1;  // right
 		insert_to_closed(map);
-		
+
 		for (i=0; i<4; i++) {
-			if (!child_flg[i]) continue;	// guard clause  // add 1 to parent depth			
+			if (!child_flg[i]) continue;	// guard clause  // add 1 to parent depth
 			if (!(is_in_closed(child[i]))) push_to_open(child[i], node_depth+1);
 		}
 
@@ -140,7 +137,6 @@ int is_in_closed(int child[][3])
 {
 	CLOSEDLIST *point;
 	point = closed_head;
-	/*
 	while (1) {
 		if (is_equal_array((*point).map_data, child))
 			return 1;
@@ -148,14 +144,6 @@ int is_in_closed(int child[][3])
 			return 0;
 		point = (*point).next;
 	}
-	*/
-	while (point != NULL) {
-		if (is_equal_array((*point).map_data, child)) return 1;
-		point = (*point).next; // BUG HERE
-		printf("point : %d\n", point); // bug solved?
-	}
-	return 0;
-
 }
 
 void release_closed_list()
@@ -166,15 +154,14 @@ void release_closed_list()
 		closed_head = (*closed_head).next;
 		free(tmp);
 	}
-	closed_tail = NULL;
+	closed_tail = NULL;  // not necessary, but more feels clean to do so
 }
 
 // restricted to one-dimension array
 void copy_array2_to_array1_1dim(int array1[], int array2[], int elem_num)
 {
 	int i;
-	for (i=0; i<elem_num; i++)
-		array1[i] = array2[i];
+	for (i=0; i<elem_num; i++) array1[i] = array2[i];
 }
 
 // restricted to three-three-element-two-dimension array
