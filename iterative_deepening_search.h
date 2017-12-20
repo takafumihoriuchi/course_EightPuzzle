@@ -33,7 +33,7 @@ CLOSEDLIST *closed_tail = NULL;
 int iterative_deepening_search(int map[][3])
 {
 	int limit = 0;
-	int i, pop_success, node_depth;
+	int i, pop_success, node_depth, match_goal_state;
 	int child[4][3][3];
 	int child_flg[4];  // 0: up, 1:down, 2:left, 3:right
 	int child_clear[4] = {0,0,0,0};
@@ -61,15 +61,19 @@ int iterative_deepening_search(int map[][3])
 			continue;  // add commands here to set limit to 'limit' / if (limit > ~) return 0; continue;
 		}
 
-		// depth limited search
+		// key of depth limited search
 		if (node_depth >= limit) continue;
 
 		copy_array2_to_array1_1dim(child_flg, child_clear, 4);
-		// expand node, then check if child node is in goal state; return 1 if so
-		if (expand_node(child[0], 'e', 0, child_flg, map)) return 1;  // up
-		if (expand_node(child[1], 'd', 1, child_flg, map)) return 1;  // down
-		if (expand_node(child[2], 's', 2, child_flg, map)) return 1;  // left
-		if (expand_node(child[3], 'f', 3, child_flg, map)) return 1;  // right
+		match_goal_state = expand_node(child[0], 'e', 0, child_flg, map);  // up
+		if (match_goal_state) return 1;
+		match_goal_state = expand_node(child[1], 'd', 1, child_flg, map);  // down
+		if (match_goal_state) return 1;
+		match_goal_state = expand_node(child[2], 's', 2, child_flg, map);  // left
+		if (match_goal_state) return 1;
+		match_goal_state = expand_node(child[3], 'f', 3, child_flg, map);  // right
+		if (match_goal_state) return 1;
+		
 		insert_to_closed(map);
 		
 		for (i=0; i<4; i++) {
