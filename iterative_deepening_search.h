@@ -22,24 +22,11 @@ void copy_array2_to_array1_2dim(int array1[][3], int array2[][3]);
 int is_equal_array(int array1[][3], int array2[][3]);
 void check_malloc_open(OPENSTACK *node);
 void check_malloc_closed(CLOSEDLIST *node);
+void print_open_stack();
 
 OPENSTACK *open_head = NULL;
 CLOSEDLIST *closed_head = NULL;
 CLOSEDLIST *closed_tail = NULL;
-
-// function used for debugging
-void print_open_stack()
-{
-	OPENSTACK *point;
-	point = open_head;
-	int i=0;
-	printf("printing open stack:\n");
-	if (point==NULL) printf("  no entry\n");
-	while (point!=NULL) {
-		printf("  open stack No.%d : %d\n", i++, point);
-		point = (*point).next;
-	}
-}
 
 // precondition : receives a map (randomly initialized)
 // postcondition : return 1 if solution is found(, if not, return 0)
@@ -56,14 +43,8 @@ int iterative_deepening_search(int map[][3])
 	// push first state to open stack
 	push_to_open(map, 0);
 
-	//debugging
-	// printf("sizeof(OPENSTACK) = %d\n", sizeof(OPENSTACK));
-	// printf("sizeof(int)       = %d\n", sizeof(int));
-	// return 1;
-
 	while (1) {
 
-		print_open_stack();
 		node_depth = get_open_head_depth();
 
 		// pop top of stack and store in map
@@ -76,10 +57,10 @@ int iterative_deepening_search(int map[][3])
 			release_closed_list();
 			push_to_open(map, 0);
 			limit++;
+			printf("proceeding to limit : %d\n", limit);
 			continue;  // add commands here to set limit to 'limit' / if (limit > ~) return 0; continue;
 		}
 
-		printf("limit : %d\n", limit);
 		// depth limited search
 		if (node_depth >= limit) continue;
 
@@ -93,10 +74,7 @@ int iterative_deepening_search(int map[][3])
 		
 		for (i=0; i<4; i++) {
 			if (!child_flg[i]) continue;	// guard clause  // add 1 to parent depth			
-			if (!(is_in_closed(child[i]))) {
-				printf("calling push_to_open() for child\n");
-				push_to_open(child[i], node_depth+1);
-			}
+			if (!(is_in_closed(child[i]))) push_to_open(child[i], node_depth+1);
 		}
 
 	}
@@ -111,7 +89,6 @@ int expand_node(int child[][3], char direction, int child_num, int child_flg[], 
 		child_flg[child_num] = 1;
 		copy_array2_to_array1_2dim(child, map);
 		operate(child, direction);
-		// end if one of the child node is in goal state
 		if (is_completed(child)) return 1;
 	}
 	return 0;
@@ -119,15 +96,9 @@ int expand_node(int child[][3], char direction, int child_num, int child_flg[], 
 
 void push_to_open(int map[][3], int depth)
 {
-	printf("pushing to open stack\n");
 	OPENSTACK *node;
-	printf("OPENSTACK *node : %d\n", node);
-	node = (OPENSTACK *)malloc(sizeof(OPENSTACK)); // BUG HERE?
-	// node=malloc...で、毎回同じ領域が確保されてしまう。
-	// free()してから、同じ場所、ならセーフになっているが、
-	// 何段もスタックを積み重ねる処理でバグとなってしまう。
+	node = (OPENSTACK *)malloc(sizeof(OPENSTACK));
 	check_malloc_open(node);
-	printf("created new node in open : %d\n", node);
 	copy_array2_to_array1_2dim((*node).map_data, map);
 	(*node).depth = depth;
 	(*node).next = open_head;
@@ -141,7 +112,6 @@ int pop_from_open(int map[][3])
 	OPENSTACK *tmp = open_head;
 	if ((*open_head).next == NULL) open_head = NULL;
 	else open_head = (*open_head).next;
-	printf("freeing node at open_head : %d\n", tmp);
 	free(tmp);
 	return 1;
 }
@@ -157,12 +127,10 @@ void insert_to_closed(int map[][3])
 	CLOSEDLIST *node;
 	node = (CLOSEDLIST *)malloc(sizeof(CLOSEDLIST));
 	check_malloc_closed(node);
-	printf("created new node in closed : %d\n", node);
 	copy_array2_to_array1_2dim((*node).map_data, map);
 	if (closed_head == NULL) closed_tail = node;
 	(*node).next = closed_head;
 	closed_head = node;
-	printf("closed_head : %d\n", node);
 }
 
 // postcondition : return 1 if given child is in closed list, if not, return 0
@@ -183,7 +151,6 @@ void release_closed_list()
 	while (closed_head != NULL) {
 		tmp = closed_head;
 		closed_head = (*closed_head).next;
-		printf("freeing node in closed list : %d\n", tmp);
 		free(tmp);
 	}
 	closed_tail = NULL;
@@ -229,5 +196,19 @@ void check_malloc_closed(CLOSEDLIST *node)
 	if (node == NULL) {
 		fprintf(stderr, "failed to allocate memory\n");
 		exit(-1);
+	}
+}
+
+// function used for debugging
+void print_open_stack()
+{
+	OPENSTACK *point;
+	point = open_head;
+	int i=0;
+	printf("open stack:\n");
+	if (point==NULL) printf("no entry\n");
+	while (point!=NULL) {
+		printf("No.%d : %d\n", i++, point);
+		point = (*point).next;
 	}
 }
