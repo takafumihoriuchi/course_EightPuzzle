@@ -10,3 +10,31 @@ iterative_deepening_searchで、進行度を表示するために、limitを表�
 	関数のプロトタイプ宣言、構造体の宣言、など
 	mainはmainだけのファイル（インタフェース用）で良い
 
+main関数のインタフェース
+	choose strategy:
+	[1] IDS
+	[2] A*(h0)
+	[3] A*(h1)
+	[4] A*(h2)
+	[5] player-input
+	> 
+	...
+	(show result cpu-time...)
+	...
+	continue? (y/n)
+	> y
+	choose strategy:
+	[1] IDS
+	[2] A*(h0)
+	[3] A*(h1)
+	[4] A*(h2)
+	[5] player-input
+	>
+	...
+
+10回の平均、のように、試行回数も指定できるようにする
+	CPU-時間に関して、その平均値を自動で計算するようにする
+
+main関数の中で、mapをどの時点で初期化するか。
+	whileを繰り返すたびに初期化するか、どのmodeを選んだとしても、最初の条件を同じにするために、whileの外で初期化するか
+

@@ -10,6 +10,7 @@ typedef struct node_closed {
 } CLOSEDLIST;
 
 int iterative_deepening_search(int map[][3]);
+int expand_children(int child[][3][3], int child_flg[], int map[][3]);
 int expand_node(int child[][3], char direction, int child_num, int child_flg[], int map[][3]);
 void push_to_open(int map[][3], int depth);
 int pop_from_open(int map[][3]);
@@ -34,9 +35,9 @@ int iterative_deepening_search(int map[][3])
 {
 	int limit = 0;
 	int i, pop_success, node_depth, match_goal_state;
+	// 0: up, 1:down, 2:left, 3:right
 	int child[4][3][3];
-	int child_flg[4];  // 0: up, 1:down, 2:left, 3:right
-	int child_clear[4] = {0,0,0,0};
+	int child_flg[4];
 
 	// end if the initialized map is already completed
 	if (is_completed(map)) return 1;
@@ -64,25 +65,31 @@ int iterative_deepening_search(int map[][3])
 		// key of depth limited search
 		if (node_depth >= limit) continue;
 
-		copy_array2_to_array1_1dim(child_flg, child_clear, 4);
-		match_goal_state = expand_node(child[0], 'e', 0, child_flg, map);  // up
-		if (match_goal_state) return 1;
-		match_goal_state = expand_node(child[1], 'd', 1, child_flg, map);  // down
-		if (match_goal_state) return 1;
-		match_goal_state = expand_node(child[2], 's', 2, child_flg, map);  // left
-		if (match_goal_state) return 1;
-		match_goal_state = expand_node(child[3], 'f', 3, child_flg, map);  // right
+		match_goal_state = expand_children(child, child_flg, map);
 		if (match_goal_state) return 1;
 		
 		insert_to_closed(map);
 		
 		for (i=0; i<4; i++) {
-			if (!child_flg[i]) continue;	// guard clause  // add 1 to parent depth			
-			if (!(is_in_closed(child[i]))) push_to_open(child[i], node_depth+1);
+			if (!child_flg[i]) continue;  // skip non-updated child
+			if (!(is_in_closed(child[i])))
+				push_to_open(child[i], node_depth+1);  // child_depth is parent_depth + 1
 		}
 
 	}
 
+}
+
+int expand_children(int child[][3][3], int child_flg[], int map[][3])
+{
+	// reset child_flg
+	int child_clear[4] = {0,0,0,0};
+	copy_array2_to_array1_1dim(child_flg, child_clear, 4);
+
+	if (expand_node(child[0], 'e', 0, child_flg, map)) return 1;  // up
+	if (expand_node(child[1], 'd', 1, child_flg, map)) return 1;  // down
+	if (expand_node(child[2], 's', 2, child_flg, map)) return 1;  // left
+	if (expand_node(child[3], 'f', 3, child_flg, map)) return 1;  // right
 }
 
 // postcondition-1 : if valid, renew the child node, if not, leave the child node as it is

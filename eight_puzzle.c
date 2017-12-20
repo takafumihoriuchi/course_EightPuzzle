@@ -16,19 +16,56 @@ int main(void)
 	int map[3][3];
 	init_map(map);
 
-	/*
-	while (!is_completed(map)) {
-		print_map(map);
-		player_input(map);
-	}
-	print_map(map);
-	printf("completed\n");
-	*/
+	while (1) {
+		
+		printf("choose strategy :\n");
+		printf("[1] IDS\n");
+		printf("[2] A*(h0)\n");
+		printf("[3] A*(h1)\n");
+		printf("[4] A*(h2)\n");
+		printf("[5] player\n");
+		printf("> ");
+		int mode;
+		scanf("%d", &mode);
+		switch (mode) {
+			case 1: // IDS
+			{
+				int ids;
+				ids = iterative_deepening_search(map);
+				if (ids) printf("puzzle solved\n");
+				else printf("failed to solve puzzle\n");
+				break;
+			}
+			case 2: // A*(h0)
+				printf("coming soon\n");
+				break;
+			case 3: // A*(h1)
+				printf("coming soon\n");
+				break;
+			case 4: // A*(h2)
+				printf("coming soon\n");
+				break;
+			case 5: // player
+				while (!is_completed(map)) {
+					print_map(map);
+					player_input(map);
+				}
+				print_map(map);
+				printf("completed\n");
+				break;
+			default: 
+				printf("caution: invalid input\n");
+				continue;
+		} // end of switch-statement
 
-	int ids;
-	ids = iterative_deepening_search(map);
-	if (ids) printf("puzzle solved\n");
-	else printf("failed to solve puzzle\n");
+		printf("continue? (y/n)\n");
+		printf("> ");
+		char resume;
+		scanf(" %c", &resume);
+		if (resume == 'y' || resume == 'Y') continue;
+		else break;
+
+	} // end of while-statement
 
 	return 0;
 }
