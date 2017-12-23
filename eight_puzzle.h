@@ -9,14 +9,14 @@ int is_valid(int map[][3], char direction);
 
 
 // player
-void player_input(int map[][3]);
+char player_input(int map[][3]);
 
 
 // iterative deepening search
 typedef struct node_open {
 	struct node_open *next;
-	int depth;
 	int map_data[3][3];
+	int depth;
 } OPENSTACK;
 typedef struct node_closed {
 	struct node_closed *next;
@@ -39,3 +39,9 @@ void check_malloc_closed(CLOSEDLIST *node);
 void print_open_stack();
 
 
+// a* search
+typedef struct open_list {
+	struct open_list *next;
+	int map_data[3][3];
+	int cost;
+} OPENLIST;

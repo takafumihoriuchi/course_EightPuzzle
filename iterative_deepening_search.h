@@ -3,7 +3,7 @@ CLOSEDLIST *closed_head = NULL;
 CLOSEDLIST *closed_tail = NULL;
 
 // precondition : receives a map (randomly initialized)
-// postcondition : return 1 if solution is found(, if not, return 0)
+// postcondition : return 1 if solution is found (if not, return 0)
 int iterative_deepening_search(int map[][3])
 {
 	// 0: up, 1:down, 2:left, 3:right
@@ -24,7 +24,7 @@ int iterative_deepening_search(int map[][3])
 		// pop top of stack and store in map
 		int pop_success = pop_from_open(map);
 		if (!pop_success) {
-			// map is initial state when limit=0
+			// map is initial state when limit = 0
 			if (closed_tail != NULL)
 				copy_array2_to_array1_2dim(map, (*closed_tail).map_data);
 				// initial map data is stored at the tail of closed list

@@ -11,14 +11,14 @@
 #include "eight_puzzle.h"
 #include "iterative_deepening_search.h"
 
-// want to print out the operators from start to goal
+// ideal postcondition : print out the operators (steps) from start to goal
 int main(void)
 {
 	int map[3][3];
 	init_map(map);
 	
 	putchar('\n');
-	printf("choose strategy :\n");
+	printf("choose strategy:\n");
 	printf("[1] IDS\n");
 	printf("[2] A*(h0)\n");
 	printf("[3] A*(h1)\n");
@@ -30,8 +30,7 @@ int main(void)
 	switch (mode) {
 		case 1: // IDS
 		{
-			int ids;
-			ids = iterative_deepening_search(map);
+			int ids = iterative_deepening_search(map);
 			if (ids) printf("puzzle solved\n");
 			else printf("failed to solve puzzle\n");
 			// not sure if it is possible to fail to solve
@@ -53,8 +52,8 @@ int main(void)
 		case 5: // player
 			while (!is_completed(map)) {
 				print_map(map);
-				player_input(map);
-				// checks validity and operate within player_input()
+				char dir = player_input(map);
+				operate(map, dir);
 			}
 			print_map(map);
 			printf("puzzle solved\n");
@@ -108,7 +107,7 @@ void print_map(int map[][3])
 	putchar('\n');
 }
 
-void player_input(int map[][3])
+char player_input(int map[][3])
 {
 	char move_zero_dir;
 	int valid;
@@ -121,8 +120,7 @@ void player_input(int map[][3])
 			move_zero_dir=='s' || move_zero_dir=='f') {
 			valid = is_valid(map, move_zero_dir);
 			if (valid) {
-				operate(map, move_zero_dir);
-				return;
+				return move_zero_dir;
 			}
 		}
 		printf("invalid input\n");
