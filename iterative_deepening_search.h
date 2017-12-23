@@ -1,30 +1,3 @@
-typedef struct node_open {
-	struct node_open *next;
-	int depth;
-	int map_data[3][3];
-} OPENSTACK;
-
-typedef struct node_closed {
-	struct node_closed *next;
-	int map_data[3][3];
-} CLOSEDLIST;
-
-int iterative_deepening_search(int map[][3]);
-int expand_children(int child[][3][3], int child_flg[], int map[][3]);
-int expand_node(int child[][3], char direction, int child_num, int child_flg[], int map[][3]);
-void push_to_open(int map[][3], int depth);
-int pop_from_open(int map[][3]);
-int get_open_head_depth();
-void insert_to_closed(int map[][3]);
-int is_in_closed(int child[][3]);
-void release_closed_list();
-void copy_array2_to_array1_1dim(int array1[], int array2[], int elem_num);
-void copy_array2_to_array1_2dim(int array1[][3], int array2[][3]);
-int is_equal_array(int array1[][3], int array2[][3]);
-void check_malloc_open(OPENSTACK *node);
-void check_malloc_closed(CLOSEDLIST *node);
-void print_open_stack();
-
 OPENSTACK *open_head = NULL;
 CLOSEDLIST *closed_head = NULL;
 CLOSEDLIST *closed_tail = NULL;
@@ -33,12 +6,12 @@ CLOSEDLIST *closed_tail = NULL;
 // postcondition : return 1 if solution is found(, if not, return 0)
 int iterative_deepening_search(int map[][3])
 {
-	int limit = 0;
-	int i, pop_success, node_depth, match_goal_state;
 	// 0: up, 1:down, 2:left, 3:right
 	int child[4][3][3];
 	int child_flg[4];
 
+	int limit = 0;
+	printf("searching with limit : %d\n", limit);
 	// end if the initialized map is already completed
 	if (is_completed(map)) return 1;
 	// push first state to open stack
@@ -46,30 +19,34 @@ int iterative_deepening_search(int map[][3])
 
 	while (1) {
 
-		node_depth = get_open_head_depth();
+		int node_depth = get_open_head_depth();
 
 		// pop top of stack and store in map
-		pop_success = pop_from_open(map);
+		int pop_success = pop_from_open(map);
 		if (!pop_success) {
 			// map is initial state when limit=0
 			if (closed_tail != NULL)
 				copy_array2_to_array1_2dim(map, (*closed_tail).map_data);
 				// initial map data is stored at the tail of closed list
 			release_closed_list();
+			// prepare for next step
 			push_to_open(map, 0);
 			limit++;
-			printf("proceeding to limit : %d\n", limit);
-			continue;  // add commands here to set limit to 'limit' / if (limit > ~) return 0; continue;
+			printf("searching with limit : %d\n", limit);
+			continue;
+			// replace 'continue' to set limit to 'limit'
+			// if (limit > ~) return 0; continue;
 		}
 
 		// key of depth limited search
 		if (node_depth >= limit) continue;
 
-		match_goal_state = expand_children(child, child_flg, map);
+		int match_goal_state = expand_children(child, child_flg, map);
 		if (match_goal_state) return 1;
 		
 		insert_to_closed(map);
 		
+		int i;
 		for (i=0; i<4; i++) {
 			if (!child_flg[i]) continue;  // skip non-updated child
 			if (!(is_in_closed(child[i])))
@@ -90,6 +67,8 @@ int expand_children(int child[][3][3], int child_flg[], int map[][3])
 	if (expand_node(child[1], 'd', 1, child_flg, map)) return 1;  // down
 	if (expand_node(child[2], 's', 2, child_flg, map)) return 1;  // left
 	if (expand_node(child[3], 'f', 3, child_flg, map)) return 1;  // right
+	// no child in goal state
+	return 0;
 }
 
 // postcondition-1 : if valid, renew the child node, if not, leave the child node as it is
