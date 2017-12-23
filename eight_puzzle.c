@@ -10,6 +10,7 @@
 #include <time.h>
 #include "eight_puzzle.h"
 #include "iterative_deepening_search.h"
+#include "a_star_search.h"
 
 // ideal postcondition : print out the operators (steps) from start to goal
 int main(void)
@@ -38,17 +39,26 @@ int main(void)
 			break;
 		}
 		case 2: // A*(h0)
-			printf("coming soon\n");
-			// a_star_search(map, 0);
+		{
+			int h0 = a_star_search(map, 0);
+			if (h0) printf("puzzle solved\n");
+			else printf("failed to solve puzzle\n");
 			break;
+		}
 		case 3: // A*(h1)
-			printf("coming soon\n");
-			// a_star_search(map, 1);
+		{
+			int h1 = a_star_search(map, 1);
+			if (h1) printf("puzzle solved\n");
+			else printf("failed to solve puzzle\n");
 			break;
+		}
 		case 4: // A*(h2)
-			printf("coming soon\n");
-			// a_star_search(map, 2);
+		{
+			int h2 = a_star_search(map, 2);
+			if (h2) printf("puzzle solved\n");
+			else printf("failed to solve puzzle\n");
 			break;
+		}
 		case 5: // player
 			while (!is_completed(map)) {
 				print_map(map);

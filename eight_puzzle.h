@@ -1,4 +1,5 @@
 // common
+
 void init_map(int map[][3]);
 void print_map(int map[][3]);
 int is_completed(int map[][3]);
@@ -9,10 +10,12 @@ int is_valid(int map[][3], char direction);
 
 
 // player
+
 char player_input(int map[][3]);
 
 
 // iterative deepening search
+
 typedef struct node_open {
 	struct node_open *next;
 	int map_data[3][3];
@@ -22,6 +25,10 @@ typedef struct node_closed {
 	struct node_closed *next;
 	int map_data[3][3];
 } CLOSEDLIST;
+OPENSTACK *open_head = NULL;
+CLOSEDLIST *closed_head = NULL;
+CLOSEDLIST *closed_tail = NULL;
+
 int iterative_deepening_search(int map[][3]);
 int expand_children(int child[][3][3], int child_flg[], int map[][3]);
 int expand_node(int child[][3], char direction, int child_num, int child_flg[], int map[][3]);
@@ -46,4 +53,8 @@ typedef struct open_list {
 	int depth;
 	int cost;
 } OPENLIST;
-// CLOSEDLIST is common with IDS
+typedef struct closed_list {
+	struct closed_list *next;
+	int map_data[3][3];
+	int cost;
+} CLOSEDLIST_A;

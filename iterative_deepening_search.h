@@ -1,7 +1,3 @@
-OPENSTACK *open_head = NULL;
-CLOSEDLIST *closed_head = NULL;
-CLOSEDLIST *closed_tail = NULL;
-
 // precondition : receives a map (randomly initialized)
 // postcondition : return 1 if solution is found (if not, return 0)
 int iterative_deepening_search(int map[][3])
