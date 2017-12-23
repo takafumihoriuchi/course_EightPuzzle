@@ -34,7 +34,7 @@ void release_closed_list();
 void copy_array2_to_array1_1dim(int array1[], int array2[], int elem_num);
 void copy_array2_to_array1_2dim(int array1[][3], int array2[][3]);
 int is_equal_array(int array1[][3], int array2[][3]);
-void check_malloc_open(OPENSTACK *node);
+void check_malloc_open_stack(OPENSTACK *node);
 void check_malloc_closed(CLOSEDLIST *node);
 void print_open_stack();
 
@@ -43,5 +43,7 @@ void print_open_stack();
 typedef struct open_list {
 	struct open_list *next;
 	int map_data[3][3];
+	int depth;
 	int cost;
 } OPENLIST;
+// CLOSEDLIST is common with IDS

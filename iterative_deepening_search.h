@@ -19,7 +19,7 @@ int iterative_deepening_search(int map[][3])
 
 	while (1) {
 
-		int node_depth = get_open_head_depth();
+		int depth = get_open_head_depth();
 
 		// pop top of stack and store in map
 		int pop_success = pop_from_open(map);
@@ -39,7 +39,7 @@ int iterative_deepening_search(int map[][3])
 		}
 
 		// key of depth limited search
-		if (node_depth >= limit) continue;
+		if (depth >= limit) continue;
 
 		int match_goal_state = expand_children(child, child_flg, map);
 		if (match_goal_state) return 1;
@@ -50,7 +50,7 @@ int iterative_deepening_search(int map[][3])
 		for (i=0; i<4; i++) {
 			if (!child_flg[i]) continue;  // skip non-updated child
 			if (!(is_in_closed(child[i])))
-				push_to_open(child[i], node_depth+1);  // child_depth is parent_depth + 1
+				push_to_open(child[i], depth+1);  // child_depth is parent_depth + 1
 		}
 
 	}
@@ -88,7 +88,7 @@ void push_to_open(int map[][3], int depth)
 {
 	OPENSTACK *node;
 	node = (OPENSTACK *)malloc(sizeof(OPENSTACK));
-	check_malloc_open(node);
+	check_malloc_open_stack(node);
 	copy_array2_to_array1_2dim((*node).map_data, map);
 	(*node).depth = depth;
 	(*node).next = open_head;
@@ -173,7 +173,7 @@ int is_equal_array(int array1[][3], int array2[][3])
 	return 1;
 }
 
-void check_malloc_open(OPENSTACK *node)
+void check_malloc_open_stack(OPENSTACK *node)
 {
 	if (node == NULL) {
 		fprintf(stderr, "failed to allocate memory\n");
