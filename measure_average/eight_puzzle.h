@@ -1,3 +1,6 @@
+// count total number of states searched
+unsigned long int cnt_state;
+
 // common
 
 void init_map(int map[][3]);

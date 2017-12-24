@@ -85,7 +85,10 @@ int main(void)
 	
 	end = clock();
 	cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-	printf("cpu time : %f\n", cpu_time_used);
+	printf("cpu time : %f sec\n", cpu_time_used);
+
+	// cnt_state : global variable counting the total number of states searched
+	printf("searched states : %lu\n", cnt_state);
 
 	putchar('\n');
 

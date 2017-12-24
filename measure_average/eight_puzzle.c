@@ -12,9 +12,6 @@
 #include "iterative_deepening_search.h"
 #include "a_star_search.h"
 
-// count total number of states searched
-unsigned long int cnt_state;
-
 // ideal postcondition : print out the operators (steps) from start to goal
 int main(void)
 {
@@ -25,72 +22,84 @@ int main(void)
 	// measure CPU time
 	clock_t start, end;
 	double cpu_time_used;
-	
-	putchar('\n');
-	printf("choose strategy:\n");
-	printf("[1] IDS\n");
-	printf("[2] A*(h0)\n");
-	printf("[3] A*(h1)\n");
-	printf("[4] A*(h2)\n");
-	printf("[5] player\n");
-	printf("> ");
+
+	// sum for calculating average
+	unsigned long int cnt_state_sum;
+	double cpu_time_used_sum;
+
 	int mode;
-	scanf("%d", &mode);
+	for (mode=1; mode<=4; mode++) {
+		cnt_state_sum = 0;
+		cpu_time_used_sum = 0;
+		int iter;
+		for (iter=0; iter<10; iter++) {
 
-	start = clock();
-
-	switch (mode) {
-		case 1:
-		{	// IDS
-			int ids = iterative_deepening_search(map);
-			if (ids) printf("puzzle solved\n");
-			else printf("failed to solve puzzle\n");
-			// currently set to increment 'limit' when failed to solve
-			// 'return 0' from IDS() is turned off
-			break;
-		}
-		case 2:
-		{	// A*(h0)
-			int h0 = a_star_search(map, 0);
-			if (h0) printf("puzzle solved\n");
-			else printf("failed to solve puzzle\n");
-			break;
-		}
-		case 3:
-		{	// A*(h1)
-			int h1 = a_star_search(map, 1);
-			if (h1) printf("puzzle solved\n");
-			else printf("failed to solve puzzle\n");
-			break;
-		}
-		case 4:
-		{	// A*(h2)
-			int h2 = a_star_search(map, 2);
-			if (h2) printf("puzzle solved\n");
-			else printf("failed to solve puzzle\n");
-			break;
-		}
-		case 5:
-			// player (note: time measured is not equal to real time)
-			while (!is_completed(map)) {
-				print_map(map);
-				char dir = player_input(map);
-				operate(map, dir);
-			}
-			print_map(map);
-			printf("puzzle solved\n");
-			break;
-		default: 
-			printf("caution: invalid input\n");
-			putchar('\n');
-			return 0;
-	} // end of switch-statement
+			start = clock();
+			switch (mode) {
+				case 1:
+				{	// IDS
+					int ids = iterative_deepening_search(map);
+					// if (ids) printf("puzzle solved\n");
+					// else printf("failed to solve puzzle\n");
+					// currently set to increment 'limit' when failed to solve
+					// 'return 0' from IDS() is turned off
+					break;
+				}
+				case 2:
+				{	// A*(h0)
+					int h0 = a_star_search(map, 0);
+					// if (h0) printf("puzzle solved\n");
+					// else printf("failed to solve puzzle\n");
+					break;
+				}
+				case 3:
+				{	// A*(h1)
+					int h1 = a_star_search(map, 1);
+					// if (h1) printf("puzzle solved\n");
+					// else printf("failed to solve puzzle\n");
+					break;
+				}
+				case 4:
+				{	// A*(h2)
+					int h2 = a_star_search(map, 2);
+					// if (h2) printf("puzzle solved\n");
+					// else printf("failed to solve puzzle\n");
+					break;
+				}
+				case 5:
+					// player (note: time measured is not equal to real time)
+					while (!is_completed(map)) {
+						print_map(map);
+						char dir = player_input(map);
+						operate(map, dir);
+					}
+					print_map(map);
+					printf("puzzle solved\n");
+					break;
+				default: 
+					printf("caution: invalid input\n");
+					putchar('\n');
+					return 0;
+			} // end of switch-statement
+			end = clock();
+			cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+			cpu_time_used_sum += cpu_time_used;
+			cnt_state_sum += cnt_state;
 	
-	end = clock();
-	cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-	printf("cpu time : %f\n", cpu_time_used);
-
-	putchar('\n');
+		} // end of for-loop (iter)
+		switch (mode) {
+			case 1:
+				printf("IDS:\n");
+			case 2:
+				printf("A*(h0):\n");
+			case 3:
+				printf("A*(h1):\n");
+			case 4:
+				printf("A*(h2):\n");
+		}
+		printf("average number of searched states : %lu\n", cnt_state_sum / 10);
+		printf("average CPU time consumed         : %f sec\n", cpu_time_used_sum / 10);
+	} // end of for-loop (mode)
 
 	return 0;
 }

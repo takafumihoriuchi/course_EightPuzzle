@@ -2,8 +2,8 @@
 // postcondition : return 1 if solution is found, if not, return 0
 int a_star_search(int map[][3], int h)
 {
-	// count total number of states searched
-	unsigned long int cnt_state=0;
+	// initialize global variable 'cnt_state'
+	cnt_state = 0;
 
 	int cost, depth;
 
@@ -19,7 +19,6 @@ int a_star_search(int map[][3], int h)
 		if (!got_node) {
 			release_closed_a();
 			// closed_head_a, closed_tail_a set back to NULL
-			printf("searched states : %lu\n", cnt_state);
 			return 0;
 		}
 		if (is_completed(map)) {
@@ -27,7 +26,6 @@ int a_star_search(int map[][3], int h)
 			// open_head_a, open_tail_a set back to NULL
 			release_closed_a();
 			// closed_head_a, closed_tail_a set back to NULL
-			printf("searched states : %lu\n", cnt_state);
 			return 1;
 		}
 
