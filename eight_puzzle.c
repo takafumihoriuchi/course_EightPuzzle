@@ -15,8 +15,13 @@
 // ideal postcondition : print out the operators (steps) from start to goal
 int main(void)
 {
+	// map is randomly initialized
 	int map[3][3];
 	init_map(map);
+
+	// measure CPU time
+	clock_t start, end;
+	double cpu_time_used;
 	
 	putchar('\n');
 	printf("choose strategy:\n");
@@ -28,38 +33,42 @@ int main(void)
 	printf("> ");
 	int mode;
 	scanf("%d", &mode);
+
+	start = clock();
+
 	switch (mode) {
-		case 1: // IDS
-		{
+		case 1:
+		{	// IDS
 			int ids = iterative_deepening_search(map);
 			if (ids) printf("puzzle solved\n");
 			else printf("failed to solve puzzle\n");
-			// not sure if it is possible to fail to solve
-			// 'return 0' from IDS is currently turned off
+			// currently set to increment 'limit' when failed to solve
+			// 'return 0' from IDS() is turned off
 			break;
 		}
-		case 2: // A*(h0)
-		{
+		case 2:
+		{	// A*(h0)
 			int h0 = a_star_search(map, 0);
 			if (h0) printf("puzzle solved\n");
 			else printf("failed to solve puzzle\n");
 			break;
 		}
-		case 3: // A*(h1)
-		{
+		case 3:
+		{	// A*(h1)
 			int h1 = a_star_search(map, 1);
 			if (h1) printf("puzzle solved\n");
 			else printf("failed to solve puzzle\n");
 			break;
 		}
-		case 4: // A*(h2)
-		{
+		case 4:
+		{	// A*(h2)
 			int h2 = a_star_search(map, 2);
 			if (h2) printf("puzzle solved\n");
 			else printf("failed to solve puzzle\n");
 			break;
 		}
-		case 5: // player
+		case 5:
+			// player (note: time measured is not equal to real time)
 			while (!is_completed(map)) {
 				print_map(map);
 				char dir = player_input(map);
@@ -70,8 +79,14 @@ int main(void)
 			break;
 		default: 
 			printf("caution: invalid input\n");
-			break;
+			putchar('\n');
+			return 0;
 	} // end of switch-statement
+	
+	end = clock();
+	cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+	printf("cpu time : %f\n", cpu_time_used);
+
 	putchar('\n');
 
 	return 0;
@@ -81,11 +96,12 @@ int main(void)
 void init_map(int map[][3])
 {
 	int flag[9] = {0,0,0,0,0,0,0,0,0};
+	// 0: not chosen yet, 1: already chosen
 	int i, j, random_number;
 	srand(time(NULL));
-	// NOTE: may not be the most efficient way of randomly initializing
 	for (i=0; i<3; i++) {
 		for (j=0; j<3; j++) {
+			// chose a new number (tracked by flag[]) for each index
 			while (1) {
 				random_number=rand()%10;
 				if (flag[random_number] == 0) break;

@@ -1,34 +1,3 @@
-OPENLIST_A *open_head_a = NULL;
-OPENLIST_A *open_tail_a = NULL;
-CLOSEDLIST_A *closed_head_a = NULL;
-CLOSEDLIST_A *closed_tail_a = NULL;
-
-int a_star_search(int map[][3], int h);
-void delete_closed_insert_open(int child[][3], int cost, int depth);
-CLOSEDLIST_A* get_match_in_closed(int child[][3]);
-void delete_from_closed(CLOSEDLIST_A *target);
-int replace_open_node(int child[][3], int cost, int depth);
-void delete_from_open(OPENLIST_A *target);
-void expand_children_a(int child[][3][3], int child_flg[], int map[][3]);
-void expand_node_a_star(int child[][3], char direction, int num, int flg[], int map[][3]);
-int get_min_cost_open(int map[][3]);
-void insert_to_open(int map[][3], int cost, int depth);
-void insertion_sort(OPENLIST_A *node);
-void insert_to_open_head(OPENLIST_A *node);
-void insert_to_open_tail(OPENLIST_A *node);
-void check_malloc_open_list(OPENLIST_A *node);
-int calc_cost(int h, int map[][3], int depth);
-int g(int depth);
-int h0();
-int h1(int map[][3]);
-int h2(int map[][3]);
-void insert_to_closed_a(int map[][3], int cost);
-void check_malloc_closed_a(CLOSEDLIST_A *node);
-int is_in_closed_a(int map[][3]);
-int get_distance(int tile_num, int i, int j);
-void release_closed_a();
-void release_open_a();
-
 // precondition : receives a map, and 'h' indicating which heuristic function to use
 // postcondition : return 1 if solution is found, if not, return 0
 int a_star_search(int map[][3], int h)
@@ -82,28 +51,6 @@ int a_star_search(int map[][3], int h)
 
 	} // end of while-loop
 
-}
-
-void release_open_a()
-{
-	OPENLIST_A *tmp;
-	while (open_head_a != NULL) {
-		tmp = open_head_a;
-		open_head_a = (*open_head_a).next;
-		free(tmp);
-	}
-	open_head_a = NULL;
-}
-
-void release_closed_a()
-{
-	CLOSEDLIST_A *tmp;
-	while (closed_head_a != NULL) {
-		tmp = closed_head_a;
-		closed_head_a = (*closed_head_a).next;
-		free(tmp);
-	}
-	closed_tail_a = NULL;
 }
 
 // g() : cost from start to current state
@@ -174,134 +121,6 @@ int get_distance(int tile_num, int i, int j)
 	return vertical_distance + horizontal_destance;
 }
 
-void insert_to_closed_a(int map[][3], int cost)
-{
-	CLOSEDLIST_A *node;
-	node = (CLOSEDLIST_A *)malloc(sizeof(CLOSEDLIST_A));
-	check_malloc_closed_a(node);
-	(*node).cost = cost;
-	copy_array2_to_array1_2dim((*node).map_data, map);
-	if (closed_head_a == NULL) closed_tail_a = node;
-	(*node).next = closed_head_a;
-	closed_head_a = node;
-}
-
-void check_malloc_closed_a(CLOSEDLIST_A *node)
-{
-	if (node == NULL) {
-		fprintf(stderr, "failed to allocate memory\n");
-		exit(-1);
-	}
-}
-
-// postcondition : return 1 if map is in closed list, if not, return 0
-int is_in_closed_a(int map[][3])
-{
-	CLOSEDLIST_A *point;
-	point = closed_head_a;
-	while (point != NULL) {
-		if (is_equal_array((*point).map_data, map)) return 1;
-		point = (*point).next;
-	}
-	return 0;
-}
-
-void delete_closed_insert_open(int child[][3], int cost, int depth)
-{
-	CLOSEDLIST_A *matching_point = get_match_in_closed(child);
-	if (cost < (*matching_point).cost) {
-		delete_from_closed(matching_point);
-		insert_to_open(child, cost, depth);
-	}
-}
-
-CLOSEDLIST_A* get_match_in_closed(int child[][3])
-{
-	CLOSEDLIST_A *point = closed_head_a;
-	while (point != NULL) {
-		if (is_equal_array(child, (*point).map_data)) break;
-		point = (*point).next;
-	}
-	return point;
-}
-
-// precondition : *target is a pointer to a node in closed list, which to delete
-// simple implementation, but not the most time efficient method (linear time)
-void delete_from_closed(CLOSEDLIST_A *target)
-{
-	// when deleting node at head of closed list
-	if (target == closed_head_a) {
-		closed_head_a = (*closed_head_a).next;
-		free(target);
-		return;
-	}
-	// deleting node located after head
-	CLOSEDLIST_A *point = closed_head_a;
-	while ((*point).next != NULL) {
-		if ((*point).next == target) {
-			// when target is at the tail 
-			if (target == closed_tail_a) {
-				(*point).next = NULL;
-				closed_tail_a = point;
-				free(target);
-				return;
-			}
-			(*point).next = (*target).next;
-			free(target);
-			return;
-		}
-		point = (*point).next;
-	}
-}
-
-// open list is manipulated (replace -> delete then insert)
-// postcondition : return 1 if node matches another node in open list
-int replace_open_node(int child[][3], int cost, int depth)
-{
-	OPENLIST_A *point = open_head_a;
-	while (point != NULL) {
-		if (is_equal_array(child, (*point).map_data)) {
-			if (cost < (*point).cost) {
-				delete_from_open(point);
-				// inserted node will be sorted upon cost
-				insert_to_open(child, cost, depth);
-			}
-			return 1;
-		}
-		point = (*point).next;
-	}
-	// matching node not found in open list
-	return 0;
-}
-
-// delete the node at (*target) in open list
-// simple implementation, but not the most time efficient method (linear time)
-void delete_from_open(OPENLIST_A *target)
-{
-	// delete node at head of open list
-	if (target == open_head_a) {
-		open_head_a = (*open_head_a).next;
-		free(target);
-		return;
-	}
-	// deleting node located after head
-	OPENLIST_A *point = open_head_a;
-	while ((*point).next != NULL) {
-		if ((*point).next == target) {
-			if (target == open_tail_a) {
-				(*point).next = NULL;
-				open_tail_a = point;
-				free(target);
-				return;
-			}
-			(*point).next = (*target).next;
-			free(target);
-			return;
-		}
-		point = (*point).next;
-	}
-}
-
 void expand_children_a(int child[][3][3], int child_flg[], int map[][3])
 {
 	// reset child_flg
@@ -324,6 +143,15 @@ void expand_node_a_star(int child[][3], char direction, int num, int flg[], int 
 	}
 }
 
+void delete_closed_insert_open(int child[][3], int cost, int depth)
+{
+	CLOSEDLIST_A *matching_point = get_match_in_closed(child);
+	if (cost < (*matching_point).cost) {
+		delete_from_closed(matching_point);
+		insert_to_open(child, cost, depth);
+	}
+}
+
 // minimal cost node is located at the head of open list
 // postcondition : corresponding map_data is copied to map[][]
 int get_min_cost_open(int map[][3])
@@ -336,6 +164,26 @@ int get_min_cost_open(int map[][3])
 	else open_head_a = (*open_head_a).next;
 	free(tmp);
 	return 1;
+}
+
+// open list is manipulated (replace -> delete then insert)
+// postcondition : return 1 if node matches another node in open list
+int replace_open_node(int child[][3], int cost, int depth)
+{
+	OPENLIST_A *point = open_head_a;
+	while (point != NULL) {
+		if (is_equal_array(child, (*point).map_data)) {
+			if (cost < (*point).cost) {
+				delete_from_open(point);
+				// inserted node will be sorted upon cost
+				insert_to_open(child, cost, depth);
+			}
+			return 1;
+		}
+		point = (*point).next;
+	}
+	// matching node not found in open list
+	return 0;
 }
 
 // insert a new node to open list, in sorted order
@@ -396,10 +244,131 @@ void insert_to_open_tail(OPENLIST_A *node)
 	(*node).next = NULL;
 }
 
+// delete the node at (*target) in open list
+// simple implementation, but not the most time efficient method (linear time)
+void delete_from_open(OPENLIST_A *target)
+{
+	// delete node at head of open list
+	if (target == open_head_a) {
+		open_head_a = (*open_head_a).next;
+		free(target);
+		return;
+	}
+	// deleting node located after head
+	OPENLIST_A *point = open_head_a;
+	while ((*point).next != NULL) {
+		if ((*point).next == target) {
+			if (target == open_tail_a) {
+				(*point).next = NULL;
+				open_tail_a = point;
+				free(target);
+				return;
+			}
+			(*point).next = (*target).next;
+			free(target);
+			return;
+		}
+		point = (*point).next;
+	}
+}
+
+void insert_to_closed_a(int map[][3], int cost)
+{
+	CLOSEDLIST_A *node;
+	node = (CLOSEDLIST_A *)malloc(sizeof(CLOSEDLIST_A));
+	check_malloc_closed_a(node);
+	(*node).cost = cost;
+	copy_array2_to_array1_2dim((*node).map_data, map);
+	if (closed_head_a == NULL) closed_tail_a = node;
+	(*node).next = closed_head_a;
+	closed_head_a = node;
+}
+
+// precondition : *target is a pointer to a node in closed list, which to delete
+// simple implementation, but not the most time efficient method (linear time)
+void delete_from_closed(CLOSEDLIST_A *target)
+{
+	// when deleting node at head of closed list
+	if (target == closed_head_a) {
+		closed_head_a = (*closed_head_a).next;
+		free(target);
+		return;
+	}
+	// deleting node located after head
+	CLOSEDLIST_A *point = closed_head_a;
+	while ((*point).next != NULL) {
+		if ((*point).next == target) {
+			// when target is at the tail 
+			if (target == closed_tail_a) {
+				(*point).next = NULL;
+				closed_tail_a = point;
+				free(target);
+				return;
+			}
+			(*point).next = (*target).next;
+			free(target);
+			return;
+		}
+		point = (*point).next;
+	}
+}
+
+// postcondition : return 1 if map is in closed list, if not, return 0
+int is_in_closed_a(int map[][3])
+{
+	CLOSEDLIST_A *point;
+	point = closed_head_a;
+	while (point != NULL) {
+		if (is_equal_array((*point).map_data, map)) return 1;
+		point = (*point).next;
+	}
+	return 0;
+}
+
+CLOSEDLIST_A* get_match_in_closed(int child[][3])
+{
+	CLOSEDLIST_A *point = closed_head_a;
+	while (point != NULL) {
+		if (is_equal_array(child, (*point).map_data)) break;
+		point = (*point).next;
+	}
+	return point;
+}
+
 void check_malloc_open_list(OPENLIST_A *node)
 {
 	if (node == NULL) {
 		fprintf(stderr, "failed to allocate memory\n");
 		exit(-1);
 	}
+}
+
+void check_malloc_closed_a(CLOSEDLIST_A *node)
+{
+	if (node == NULL) {
+		fprintf(stderr, "failed to allocate memory\n");
+		exit(-1);
+	}
+}
+
+void release_open_a()
+{
+	OPENLIST_A *tmp;
+	while (open_head_a != NULL) {
+		tmp = open_head_a;
+		open_head_a = (*open_head_a).next;
+		free(tmp);
+	}
+	open_head_a = NULL;
+}
+
+void release_closed_a()
+{
+	CLOSEDLIST_A *tmp;
+	while (closed_head_a != NULL) {
+		tmp = closed_head_a;
+		closed_head_a = (*closed_head_a).next;
+		free(tmp);
+	}
+	closed_tail_a = NULL;
 }

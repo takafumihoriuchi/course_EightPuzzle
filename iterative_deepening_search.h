@@ -31,7 +31,7 @@ int iterative_deepening_search(int map[][3])
 			printf("searching with limit : %d\n", limit);
 			continue;
 			// replace 'continue' to set limit to 'limit'
-			// if (limit > ~) return 0; continue;
+			// code: ( if (limit > X) return 0; continue; )
 		}
 
 		// key of depth limited search
