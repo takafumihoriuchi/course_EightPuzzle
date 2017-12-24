@@ -1,3 +1,8 @@
+to connect to 理工UNIX:
+ssh -l 1w1~50 muse01.mse.waseda.ac.jp
+to exit:
+exit
+
 改良点：
 
 iterative_deepening_searchで、進行度を表示するために、limitを表示するのはいいが、

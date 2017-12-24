@@ -38,7 +38,13 @@ int iterative_deepening_search(int map[][3])
 		if (depth >= limit) continue;
 
 		int match_goal_state = expand_children(child, child_flg, map);
-		if (match_goal_state) return 1;
+		if (match_goal_state) {
+			release_closed_list();
+			// closed_head, closed_tail set back to NULL
+			release_open_stack();
+			// open_head set back to NULL
+			return 1;
+		}
 		
 		insert_to_closed(map);
 		
@@ -140,6 +146,16 @@ void release_closed_list()
 		free(tmp);
 	}
 	closed_tail = NULL;
+}
+
+void release_open_stack()
+{
+	OPENSTACK *tmp;
+	while (open_head != NULL) {
+		tmp = open_head;
+		open_head = (*open_head).next;
+		free(tmp);
+	}
 }
 
 // restricted to one-dimension array

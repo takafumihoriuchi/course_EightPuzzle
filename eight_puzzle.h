@@ -43,8 +43,8 @@ void copy_array2_to_array1_2dim(int array1[][3], int array2[][3]);
 int is_equal_array(int array1[][3], int array2[][3]);
 void check_malloc_open_stack(OPENSTACK *node);
 void check_malloc_closed(CLOSEDLIST *node);
-void print_open_stack();
-
+void release_open_stack();
+void print_open_stack();  // funtion for debugging
 
 // a* search
 typedef struct open_list {
