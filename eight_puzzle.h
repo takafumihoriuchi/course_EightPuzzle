@@ -52,7 +52,7 @@ typedef struct open_list {
 	int map_data[3][3];
 	int depth;
 	int cost;
-} OPENLIST;
+} OPENLIST_A;
 typedef struct closed_list {
 	struct closed_list *next;
 	int map_data[3][3];
