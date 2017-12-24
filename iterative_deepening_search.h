@@ -2,6 +2,9 @@
 // postcondition : return 1 if solution is found (if not, return 0)
 int iterative_deepening_search(int map[][3])
 {
+	// count total number of states searched
+	unsigned long int cnt_state=0;
+
 	// 0: up, 1:down, 2:left, 3:right
 	int child[4][3][3];
 	int child_flg[4];
@@ -43,10 +46,12 @@ int iterative_deepening_search(int map[][3])
 			// closed_head, closed_tail set back to NULL
 			release_open_stack();
 			// open_head set back to NULL
+			printf("total number of searched states : %lu\n", cnt_state);
 			return 1;
 		}
 		
 		insert_to_closed(map);
+		cnt_state++;
 		
 		int i;
 		for (i=0; i<4; i++) {
