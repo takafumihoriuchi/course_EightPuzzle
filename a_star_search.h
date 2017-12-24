@@ -9,7 +9,7 @@ CLOSEDLIST_A* get_match_in_closed(int child[][3]);
 void delete_from_closed(CLOSEDLIST_A *target);
 int replace_open_node(int child[][3], int cost, int depth);
 void delete_from_open(OPENLIST_A *target);
-void expand_children_a_star(int child[][3][3], int child_flg[], int map[][3]);
+void expand_children_a(int child[][3][3], int child_flg[], int map[][3]);
 void expand_node_a_star(int child[][3], char direction, int num, int flg[], int map[][3]);
 int get_min_cost_open(int map[][3]);
 void insert_to_open(int map[][3], int cost, int depth);
@@ -38,7 +38,6 @@ int a_star_search(int map[][3], int h)
 	depth = 0;
 	cost = calc_cost(h, map, depth);
 	insert_to_open(map, cost, depth);
-printf("depth : %d,  cost: %d\n", depth, cost);
 	while (1) {
 
 		depth = (*open_head_a).depth;
@@ -57,23 +56,20 @@ printf("depth : %d,  cost: %d\n", depth, cost);
 			// closed_head_a, closed_tail_a set back to NULL
 			return 1;
 		}
-printf("depth : %d,  cost: %d\n", depth, cost);
+
 		int child[4][3][3];
 		// 0: up, 1:down, 2:left, 3:right
 		int child_flg[4];
 		// flg=1: expanded, flg=0: failed to expand
-		expand_children_a_star(child, child_flg, map);
+		expand_children_a(child, child_flg, map);
 		insert_to_closed_a(map, cost);
 		int i;
 		for (i=0; i<4; i++) {
 			if (child_flg[i] == 0) continue;
 			cost = calc_cost(h, child[i], depth+1);
-printf("depth : %d,  cost: %d\n", depth, cost);
-printf("is_in_closed_a(child[%d]): %d\n", i, is_in_closed_a(child[i]));
 			if (!(is_in_closed_a(child[i]))) {
 				// child is not in closed list
 				int is_in_open = replace_open_node(child[i], cost, depth+1);
-printf("is_in_open: %d\n", is_in_open);
 				if (is_in_open) continue;
 				// child node is new to both open list and closed list
 				insert_to_open(child[i], cost, depth+1);
@@ -136,9 +132,10 @@ int h1(int map[][3])
 	for (i=0; i<3; i++) {
 		for (j=0; j<3; j++) {
 			if (map[i][j] == 0) continue;
-			if (map[i][j] == completed_map[i][j]) count++;
+			if (map[i][j] != completed_map[i][j]) count++;
 		}
 	}
+printf("count = %d\n", count);
 	return count;
 }
 
@@ -154,6 +151,7 @@ int h2(int map[][3])
 			manhattan += get_distance(map[i][j], i, j);
 		}
 	}
+printf("manhattan = %d\n", manhattan);
 	return manhattan;
 }
 
@@ -304,7 +302,7 @@ void delete_from_open(OPENLIST_A *target)
 	}
 }
 
-void expand_children_a_star(int child[][3][3], int child_flg[], int map[][3])
+void expand_children_a(int child[][3][3], int child_flg[], int map[][3])
 {
 	// reset child_flg
 	int child_clear[4] = {0,0,0,0};
@@ -343,11 +341,9 @@ int get_min_cost_open(int map[][3])
 // insert a new node to open list, in sorted order
 void insert_to_open(int map[][3], int cost, int depth)
 {
-printf("inserting to open\n");
 	OPENLIST_A *node;
 	node = (OPENLIST_A *)malloc(sizeof(OPENLIST_A));
 	check_malloc_open_list(node);
-printf("malloc success!\n");
 	copy_array2_to_array1_2dim((*node).map_data, map);
 	(*node).depth = depth;
 	(*node).cost = cost;
@@ -356,55 +352,35 @@ printf("malloc success!\n");
 		(*node).next = NULL;
 		open_head_a = node;
 		open_tail_a = node;
-printf("when open list was empty\n");
 	} else {
-		// sort by cost as inserting
+		// insert in sorted order of cost (ascending)
 		insertion_sort(node);
 	}
-printf("stopping here?\n");
 }
 
 // postcondition : open list is in ascending order
 void insertion_sort(OPENLIST_A *node)
 {
-printf("insertion sort\n");
 	if ((*node).cost <= (*open_head_a).cost) {
-printf("inserting to head of open list\n");
 		insert_to_open_head(node);
-printf("inserted to head of open list\n");
 		return;
 	}
-printf("this???\n");
-printf("(*open_head_a).cost: %d\n", (*open_head_a).cost);
-printf("(*node).cost: %d\n", (*node).cost);
-printf("(*open_tail_a).cost: %d\n", (*open_tail_a).cost);
 	if ((*node).cost > (*open_tail_a).cost) {
-printf("inserting to tail of open list\n");
 		insert_to_open_tail(node);
-printf("inserted to tail of open list\n");
 		return;
 	}
 	// when inserting between head and tail
-printf("inserting between head and tail of open list\n");
 	OPENLIST_A *point = open_head_a;
-printf("declared OPENLIST_A *point\n");
-printf("open_head_a: %d\n", open_head_a);
-printf("(*open_head_a).next: %d\n", (*open_head_a).next);
-printf("(*((*open_head_a).next)).next: %d\n", (*((*open_head_a).next)).next);
-printf("open_tail_a: %d\n", open_tail_a);
-printf("(*open_tail_a).next: %d\n", (*open_tail_a).next);
 	// compares cost of *node and cost of node after *point
 	while ((*point).next != NULL) {
 		if ((*node).cost <= (*((*point).next)).cost) {
-printf("inserting in betw!\n");
 			(*node).next = (*point).next;
 			(*point).next = node;
 			break;
 		}
 		point = (*point).next;
-printf("(*point).next: %d\n", (*point).next);
 	}
-printf("inserted between head and tail of open list\n");
+
 }
 
 void insert_to_open_head(OPENLIST_A *node)
