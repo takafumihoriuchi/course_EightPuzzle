@@ -2,15 +2,14 @@
 // postcondition : return 1 if solution is found (if not, return 0)
 int iterative_deepening_search(int map[][3])
 {
-	// count total number of states searched
-	unsigned long int cnt_state=0;
-
+	// initialize global variable 'cnt_state'
+	cnt_state = 0;
+	
 	// 0: up, 1:down, 2:left, 3:right
 	int child[4][3][3];
 	int child_flg[4];
 
 	int limit = 0;
-	printf("searching with limit : %d\n", limit);
 	// end if the initialized map is already completed
 	if (is_completed(map)) return 1;
 	// push first state to open stack
@@ -31,7 +30,6 @@ int iterative_deepening_search(int map[][3])
 			// prepare for next step
 			push_to_open(map, 0);
 			limit++;
-			printf("searching with limit : %d\n", limit);
 			continue;
 			// replace 'continue' to set limit to 'limit'
 			// code: ( if (limit > X) return 0; continue; )
@@ -46,7 +44,6 @@ int iterative_deepening_search(int map[][3])
 			// closed_head, closed_tail set back to NULL
 			release_open_stack();
 			// open_head set back to NULL
-			printf("searched states : %lu\n", cnt_state);
 			return 1;
 		}
 		
