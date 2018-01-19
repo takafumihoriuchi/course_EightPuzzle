@@ -1,14 +1,14 @@
-/******************************/
-/*                            */
-/*   a game of eight puzzle   */
-/*   - by Takafumi Horiuchi   */
-/*                            */
-/******************************/
+/********************************/
+/*                              */
+/*   a game of fifteen puzzle   */
+/*     - by Takafumi Horiuchi   */
+/*                              */
+/********************************/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "eight_puzzle.h"
+#include "fifteen_puzzle.h"
 #include "iterative_deepening_search.h"
 #include "a_star_search.h"
 
@@ -16,9 +16,8 @@
 int main(void)
 {
 	// map is randomly initialized
-	int map[3][3];
+	int map[N][N];
 	init_map(map);
-
 	// measure CPU time
 	clock_t start, end;
 	double cpu_time_used;
@@ -95,18 +94,18 @@ int main(void)
 	return 0;
 }
 
-// '0 (zero)' in 'map[][3]' represent the open space
-void init_map(int map[][3])
+// '0 (zero)' in 'map[][N]' represent the open space
+void init_map(int map[][N])
 {
-	int flag[9] = {0,0,0,0,0,0,0,0,0};
+	int flag[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 	// 0: not chosen yet, 1: already chosen
 	int i, j, random_number;
 	srand(time(NULL));
-	for (i=0; i<3; i++) {
-		for (j=0; j<3; j++) {
+	for (i=0; i<N; i++) {
+		for (j=0; j<N; j++) {
 			// chose a new number (tracked by flag[]) for each index
 			while (1) {
-				random_number=rand()%9;
+				random_number=rand()%(N*N);
 				if (flag[random_number] == 0) break;
 			}
 			map[i][j] = random_number;
@@ -116,27 +115,28 @@ void init_map(int map[][3])
 }
 
 // returns 1 if puzzle completed, if not, return 0
-int is_completed(int map[][3])
+int is_completed(int map[][N])
 {
-	return (map[0][0]==1 && map[0][1]==2 && map[0][2]==3
-		 && map[1][0]==8 && map[1][1]==0 && map[1][2]==4
-		 && map[2][0]==7 && map[2][1]==6 && map[2][2]==5);
+	return (map[0][0]==1 && map[0][1]==2 && map[0][2]==3 && map[0][3]==4
+		 && map[1][0]==5 && map[1][1]==6 && map[1][2]==7 && map[1][3]==8
+		 && map[2][0]==9 && map[2][1]==10 && map[2][2]==11 && map[2][3]==12
+		 && map[3][0]==13 && map[3][1]==14 && map[3][2]==15 && map[3][3]==0);
 }
 
-void print_map(int map[][3])
+void print_map(int map[][N])
 {
 	int i, j;
 	putchar('\n');
-	for (i=0; i<3; i++) {
-		for (j=0; j<3; j++) {
-			printf(" %d ", map[i][j]);
+	for (i=0; i<N; i++) {
+		for (j=0; j<N; j++) {
+			printf("  %2d", map[i][j]);
 		}
 		putchar('\n');
+		putchar('\n');
 	}
-	putchar('\n');
 }
 
-char player_input(int map[][3])
+char player_input(int map[][N])
 {
 	char move_zero_dir;
 	int valid;
@@ -158,7 +158,7 @@ char player_input(int map[][3])
 
 // precondition : 'direction' to 'map' is valid
 // move space/zero one step to 'direction'
-void operate(int map[][3], char direction)
+void operate(int map[][N], char direction)
 {
 	int zero_row, zero_col;
 	zero_row = get_zero_row(map);
@@ -186,32 +186,33 @@ void operate(int map[][3], char direction)
 }
 
 // returns '1' if the player input is valid
-int is_valid(int map[][3], char direction)
+int is_valid(int map[][N], char direction)
 {
 	int zero_row, zero_col;
 	zero_row = get_zero_row(map);
 	zero_col = get_zero_col(map);
 	if (zero_row==0 && direction=='e') return 0;
-	if (zero_row==2 && direction=='d') return 0;
+	if (zero_row==N-1 && direction=='d') return 0;
 	if (zero_col==0 && direction=='s') return 0;
-	if (zero_col==2 && direction=='f') return 0;
+	if (zero_col==N-1 && direction=='f') return 0;
+	// return valid
 	return 1;
 }
 
 // postcondition : certain to return 'i', no default return
-int get_zero_row(int map[][3])
+int get_zero_row(int map[][N])
 {
 	int i, j;
-	for (i=0; i<3; i++)
-		for (j=0; j<3; j++)
+	for (i=0; i<N; i++)
+		for (j=0; j<N; j++)
 			if (map[i][j]==0) return i;
 }
 
 // postcondition : certain to return 'i', no default return
-int get_zero_col(int map[][3])
+int get_zero_col(int map[][N])
 {
 	int i, j;
-	for (i=0; i<3; i++)
-		for (j=0; j<3; j++)
+	for (i=0; i<N; i++)
+		for (j=0; j<N; j++)
 			if (map[i][j]==0) return j;
 }
